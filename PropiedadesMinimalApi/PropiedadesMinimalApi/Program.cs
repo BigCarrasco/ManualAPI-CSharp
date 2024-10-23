@@ -15,7 +15,10 @@ if (app.Environment.IsDevelopment())
 }
 
 // Primeros endpoints (Los endpoints deben estar antes de app.Run() )
-app.MapGet("/saludo", () => "Bienvenidos .NET CORE");
+app.MapGet("/saludo", () =>
+{
+    return Results.BadRequest("Texto: Error generado 404");
+});
 app.MapPost("/saludo2", () => "Curso minimal API .NET CORE");
 app.UseHttpsRedirection();
 app.Run();

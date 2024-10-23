@@ -1,9 +1,9 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "C:\\Users\\Usuario\\Documents\\PropiedadesMinimalApi\\",
+  "WorkspaceRootPath": "C:\\Users\\Usuario\\Documents\\ManualAPI-CSharp\\PropiedadesMinimalApi\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{180A3462-1162-4D26-B15D-DC8D63FC655A}|PropiedadesMinimalApi\\PropiedadesMinimalApi.csproj|c:\\users\\usuario\\documents\\propiedadesminimalapi\\propiedadesminimalapi\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{180A3462-1162-4D26-B15D-DC8D63FC655A}|PropiedadesMinimalApi\\PropiedadesMinimalApi.csproj|c:\\users\\usuario\\documents\\manualapi-csharp\\propiedadesminimalapi\\propiedadesminimalapi\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{180A3462-1162-4D26-B15D-DC8D63FC655A}|PropiedadesMinimalApi\\PropiedadesMinimalApi.csproj|solutionrelative:propiedadesminimalapi\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
@@ -20,11 +20,11 @@
               "$type": "Document",
               "DocumentIndex": 0,
               "Title": "Program.cs",
-              "DocumentMoniker": "C:\\Users\\Usuario\\Documents\\PropiedadesMinimalApi\\PropiedadesMinimalApi\\Program.cs",
+              "DocumentMoniker": "C:\\Users\\Usuario\\Documents\\ManualAPI-CSharp\\PropiedadesMinimalApi\\PropiedadesMinimalApi\\Program.cs",
               "RelativeDocumentMoniker": "PropiedadesMinimalApi\\Program.cs",
-              "ToolTip": "C:\\Users\\Usuario\\Documents\\PropiedadesMinimalApi\\PropiedadesMinimalApi\\Program.cs",
+              "ToolTip": "C:\\Users\\Usuario\\Documents\\ManualAPI-CSharp\\PropiedadesMinimalApi\\PropiedadesMinimalApi\\Program.cs",
               "RelativeToolTip": "PropiedadesMinimalApi\\Program.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAnAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAAXAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-10-23T19:35:17.2Z",
               "EditorCaption": ""
