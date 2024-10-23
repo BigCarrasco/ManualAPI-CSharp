@@ -1,0 +1,41 @@
+# Archivos de build
+bin/
+obj/
+
+# Archivos de publicación
+publish/
+
+# Archivos generados por el entorno de desarrollo
+.vscode/
+.idea/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Paquetes NuGet
+*.nupkg
+*.snupkg
+packages/
+
+# Dependencias del proyecto
+lib/
+
+# Logs
+*.log
+
+# Archivos temporales de Visual Studio
+*.cache
+*.pdb
+
+# Configuraciones locales de Visual Studio
+.vscode/
+.idea/
+*.userprefs
+
+# Respetar todas las subcarpetas
+**
+
+# Otros archivos innecesarios
+[Tt]humbs.db
+*.DS_Store
