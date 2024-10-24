@@ -33,17 +33,17 @@ if (app.Environment.IsDevelopment())
 
 
 /*Obtener todas las propiedades*/
-app.MapGet("/api/propiedades", (ILogger<Program> logger) => //Ilogger viene por defecto
+app.MapGet("/api/propiedades", (ILogger<Program> logger) => //Inyeccion de dependencias //Ilogger viene por defecto
 {
     logger.Log(LogLevel.Information, "Carga todas las propiedades");
     return Results.Ok(DatosPropiedad.listaPropiedades);
-});
+}).WithName("ObtenerPropiedades");
 
 /*Obtener propiedad individual */
 app.MapGet("/api/propiedades/{id:int}", (int id) =>
 {
     return Results.Ok(DatosPropiedad.listaPropiedades.FirstOrDefault(p => p.IdPropiedad == id));
-});
+}).WithName("ObtenerPropiedad");
 
 //Crear Propiedad
 app.MapPost("/api/propiedades", ([FromBody] Propiedad propiedad) =>
@@ -68,9 +68,13 @@ app.MapPost("/api/propiedades", ([FromBody] Propiedad propiedad) =>
     // Agregar la nueva propiedad a la lista de propiedades
     DatosPropiedad.listaPropiedades.Add(propiedad);
 
-    // Retornar la lista actualizada de propiedades como respuesta
-    return Results.Ok(DatosPropiedad.listaPropiedades);
-});
+    /* Retornar la lista actualizada de propiedades como respuesta */
+    //return Results.Ok(DatosPropiedad.listaPropiedades);
+    /*Genera un 201 como respuesta, pero no coloca la location adecuada*/
+    //return Results.Created("/api/propiedades/{propiedad.IdPropiedad}", propiedad);
+    return Results.CreatedAtRoute("ObtenerPropiedad", new {id = propiedad.IdPropiedad}, propiedad);
+
+}).WithName("CrearPropiedad");
 
 app.UseHttpsRedirection();
 app.Run();
