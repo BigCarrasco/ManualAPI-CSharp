@@ -33,8 +33,9 @@ if (app.Environment.IsDevelopment())
 
 
 /*Obtener todas las propiedades*/
-app.MapGet("/api/propiedades", () =>
+app.MapGet("/api/propiedades", (ILogger<Program> logger) => //Ilogger viene por defecto
 {
+    logger.Log(LogLevel.Information, "Carga todas las propiedades");
     return Results.Ok(DatosPropiedad.listaPropiedades);
 });
 
