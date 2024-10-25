@@ -12,7 +12,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
+//dependencia AutoMapper
+builder.Services.AddAutoMapper(typeof(ConfiguracionMapas));
 
 var app = builder.Build();
 
