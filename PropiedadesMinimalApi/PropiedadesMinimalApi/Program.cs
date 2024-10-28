@@ -8,6 +8,8 @@ using PropiedadesMinimalApi.Modelos.DTOS;
 using PropiedadesMinimalApi.Mapas;
 using AutoMapper;
 using FluentValidation;
+using System.Net;
+using Microsoft.Extensions.Logging;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -30,33 +32,51 @@ if (app.Environment.IsDevelopment())
 
 app.MapGet("/api/propiedades", (ILogger<Program> logger) => 
 {
+
+    RespuestaAPI respuesta = new RespuestaAPI();
+
     logger.Log(LogLevel.Information, "Carga todas las propiedades");
-    return Results.Ok(DatosPropiedad.listaPropiedades);
-}).WithName("ObtenerPropiedades").Produces<IEnumerable<Propiedad>>(200); ;
+
+    respuesta.Resultado = DatosPropiedad.listaPropiedades;
+    respuesta.Success = true;
+    respuesta.codigoEstado = HttpStatusCode.OK;
+    return Results.Ok(respuesta);
+
+
+}).WithName("ObtenerPropiedades").Produces<IEnumerable<RespuestaAPI>>(200); ;
 
 
 app.MapGet("/api/propiedades/{id:int}", (int id) =>
 {
-    return Results.Ok(DatosPropiedad.listaPropiedades.FirstOrDefault(p => p.IdPropiedad == id));
-}).WithName("ObtenerPropiedad").Produces<Propiedad>(200);
+    RespuestaAPI respuesta = new RespuestaAPI();
+
+    respuesta.Resultado = DatosPropiedad.listaPropiedades.FirstOrDefault(p => p.IdPropiedad == id);
+    respuesta.Success = true;
+    respuesta.codigoEstado = HttpStatusCode.OK;
+    return Results.Ok(respuesta);
+
+}).WithName("ObtenerPropiedad").Produces<RespuestaAPI>(200);
 
 // Crear propiedad
-app.MapPost("/api/propiedades", (IMapper _mapper, 
+app.MapPost("/api/propiedades", async (IMapper _mapper, 
     IValidator<CrearPropiedadDTO> _validacion, [FromBody] CrearPropiedadDTO crearPropiedadDTO) =>
 {
+    RespuestaAPI respuesta = new RespuestaAPI() { Success = false, codigoEstado = HttpStatusCode.BadRequest};
 
-    var resultadoValidaciones = _validacion.ValidateAsync(crearPropiedadDTO).GetAwaiter().GetResult();
+    var resultadoValidaciones = await _validacion.ValidateAsync(crearPropiedadDTO);
 
     //Si el resultado de las validaciones no es valido, se retorna un BadRequest con el primer error
     if (!resultadoValidaciones.IsValid)
     {
-        return Results.BadRequest(resultadoValidaciones.Errors.FirstOrDefault().ToString());
+        respuesta.Errores.Add(resultadoValidaciones.Errors.FirstOrDefault().ToString());
+        return Results.BadRequest(respuesta);
     }
 
 
     if (DatosPropiedad.listaPropiedades.FirstOrDefault(p => p.Nombre.ToLower() == crearPropiedadDTO.Nombre.ToLower()) != null)
     {
-        return Results.BadRequest("Ya existe una propiedad con ese nombre");
+        respuesta.Errores.Add("Ya existe una propiedad con ese nombre");
+        return Results.BadRequest(respuesta);
     }
 
     //Propiedad propiedad = new Propiedad()
@@ -84,9 +104,49 @@ app.MapPost("/api/propiedades", (IMapper _mapper,
 
     DatosPropiedad.listaPropiedades.Add(propiedad);
 
-    return Results.CreatedAtRoute("ObtenerPropiedad", new {id = propiedad.IdPropiedad}, propiedadDTO);
+    //return Results.CreatedAtRoute("ObtenerPropiedad", new {id = propiedad.IdPropiedad}, propiedadDTO);
 
-}).WithName("CrearPropiedad").Accepts<CrearPropiedadDTO>("application/json").Produces<PropiedadDTO>(201).Produces(400);
+    respuesta.Resultado = propiedadDTO;
+    respuesta.Success = true;
+    respuesta.codigoEstado = HttpStatusCode.Created;
+    return Results.Ok(respuesta);
+
+}).WithName("CrearPropiedad").Accepts<CrearPropiedadDTO>("application/json").Produces<RespuestaAPI>(201).Produces(400);
+
+//Actualiza Propiedad
+app.MapPut("/api/propiedades", async (IMapper _mapper,
+    IValidator<ActualizarPropiedadDTO> _validacion, [FromBody] ActualizarPropiedadDTO actualizarPropiedadDTO) =>
+{
+    RespuestaAPI respuesta = new RespuestaAPI() { Success = false, codigoEstado = HttpStatusCode.BadRequest };
+
+    var resultadoValidaciones = await _validacion.ValidateAsync(actualizarPropiedadDTO);
+
+    if (!resultadoValidaciones.IsValid)
+    {
+        respuesta.Errores.Add(resultadoValidaciones.Errors.FirstOrDefault().ToString());
+        return Results.BadRequest(respuesta);
+    }
+
+    //if (DatosPropiedad.listaPropiedades.FirstOrDefault(p => p.Nombre.ToLower() == crearPropiedadDTO.Nombre.ToLower()) != null)
+    //{
+    //    respuesta.Errores.Add("Ya existe una propiedad con ese nombre");
+    //    return Results.BadRequest(respuesta);
+    //}
+
+    Propiedad propiedadDesdeBD = DatosPropiedad.listaPropiedades.FirstOrDefault(p => p.IdPropiedad == actualizarPropiedadDTO.IdPropiedad);
+
+    propiedadDesdeBD.Nombre = actualizarPropiedadDTO.Nombre;
+    propiedadDesdeBD.Descripcion = actualizarPropiedadDTO.Descripcion;
+    propiedadDesdeBD.Ubicacion = actualizarPropiedadDTO.Ubicacion;
+    propiedadDesdeBD.Activa = actualizarPropiedadDTO.Activa;
+
+    respuesta.Resultado = _mapper.Map<PropiedadDTO>(propiedadDesdeBD); ;
+    respuesta.Success = true;
+    respuesta.codigoEstado = HttpStatusCode.Created;
+    return Results.Ok(respuesta);
+
+}).WithName("ActualizarPropiedad").Accepts<ActualizarPropiedadDTO>("application/json").Produces<RespuestaAPI>(200).Produces(400);
+
 
 app.UseHttpsRedirection();
 app.Run();
