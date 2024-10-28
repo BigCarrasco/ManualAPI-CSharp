@@ -29,7 +29,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-
+//Obtener ALL
 app.MapGet("/api/propiedades", (ILogger<Program> logger) => 
 {
 
@@ -45,7 +45,7 @@ app.MapGet("/api/propiedades", (ILogger<Program> logger) =>
 
 }).WithName("ObtenerPropiedades").Produces<IEnumerable<RespuestaAPI>>(200); ;
 
-
+//Obtener por ID
 app.MapGet("/api/propiedades/{id:int}", (int id) =>
 {
     RespuestaAPI respuesta = new RespuestaAPI();
@@ -146,6 +146,29 @@ app.MapPut("/api/propiedades", async (IMapper _mapper,
     return Results.Ok(respuesta);
 
 }).WithName("ActualizarPropiedad").Accepts<ActualizarPropiedadDTO>("application/json").Produces<RespuestaAPI>(200).Produces(400);
+
+//Borrar por ID
+app.MapDelete("/api/propiedades/{id:int}", (int id) =>
+{
+    RespuestaAPI respuesta = new RespuestaAPI() { Success = false, codigoEstado = HttpStatusCode.BadRequest };
+
+    //obtener el id de la propiedad a eliminar
+    Propiedad propiedadDesdeBD = DatosPropiedad.listaPropiedades.FirstOrDefault(p => p.IdPropiedad == id);
+
+    if (propiedadDesdeBD != null)
+    {
+        DatosPropiedad.listaPropiedades.Remove(propiedadDesdeBD);
+        respuesta.Success = true;
+        respuesta.codigoEstado = HttpStatusCode.NoContent;
+        return Results.Ok(respuesta);
+    }
+    else
+    {
+        respuesta.Errores.Add("No se encontro la propiedad a eliminar");
+        return Results.BadRequest(respuesta);
+    }
+
+});
 
 
 app.UseHttpsRedirection();
