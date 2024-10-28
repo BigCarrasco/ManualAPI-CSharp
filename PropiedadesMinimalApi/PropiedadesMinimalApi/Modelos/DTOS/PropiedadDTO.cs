@@ -2,6 +2,7 @@
 {
     public class PropiedadDTO
     {
+        //Propiedad diseñada para devolver una respuesta despues de la creacion de una propiedad
         public int IdPropiedad { get; set; }
         public string Nombre { get; set; }
         public string Descripcion { get; set; }

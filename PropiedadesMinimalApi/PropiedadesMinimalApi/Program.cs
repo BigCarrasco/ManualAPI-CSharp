@@ -6,6 +6,8 @@ using PropiedadesMinimalApi.Datos;
 using PropiedadesMinimalApi.Modelos;
 using PropiedadesMinimalApi.Modelos.DTOS;
 using PropiedadesMinimalApi.Mapas;
+using AutoMapper;
+using FluentValidation;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,6 +17,8 @@ builder.Services.AddSwaggerGen();
 //dependencia AutoMapper
 builder.Services.AddAutoMapper(typeof(ConfiguracionMapas));
 
+//añadir validaciones
+builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -22,6 +26,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
 
 app.MapGet("/api/propiedades", (ILogger<Program> logger) => 
 {
@@ -36,12 +41,16 @@ app.MapGet("/api/propiedades/{id:int}", (int id) =>
 }).WithName("ObtenerPropiedad").Produces<Propiedad>(200);
 
 // Crear propiedad
-app.MapPost("/api/propiedades", ([FromBody] CrearPropiedadDTO crearPropiedadDTO) =>
+app.MapPost("/api/propiedades", (IMapper _mapper, 
+    IValidator<CrearPropiedadDTO> _validacion, [FromBody] CrearPropiedadDTO crearPropiedadDTO) =>
 {
 
-    if (string.IsNullOrEmpty(crearPropiedadDTO.Nombre))
+    var resultadoValidaciones = _validacion.ValidateAsync(crearPropiedadDTO).GetAwaiter().GetResult();
+
+    //Si el resultado de las validaciones no es valido, se retorna un BadRequest con el primer error
+    if (!resultadoValidaciones.IsValid)
     {
-        return Results.BadRequest("La propiedad no puede tener un ID incorrecto o el nombre no puede estar vacio");
+        return Results.BadRequest(resultadoValidaciones.Errors.FirstOrDefault().ToString());
     }
 
 
@@ -50,24 +59,28 @@ app.MapPost("/api/propiedades", ([FromBody] CrearPropiedadDTO crearPropiedadDTO)
         return Results.BadRequest("Ya existe una propiedad con ese nombre");
     }
 
-    Propiedad propiedad = new Propiedad()
-    {
-        Nombre = crearPropiedadDTO.Nombre,
-        Descripcion = crearPropiedadDTO.Descripcion,
-        Ubicacion = crearPropiedadDTO.Ubicacion,
-        Activa = crearPropiedadDTO.Activa
-    };
+    //Propiedad propiedad = new Propiedad()
+    //{
+    //    Nombre = crearPropiedadDTO.Nombre,
+    //    Descripcion = crearPropiedadDTO.Descripcion,
+    //    Ubicacion = crearPropiedadDTO.Ubicacion,
+    //    Activa = crearPropiedadDTO.Activa
+    //};
+
+    Propiedad propiedad = _mapper.Map<Propiedad>(crearPropiedadDTO);
 
     propiedad.IdPropiedad = DatosPropiedad.listaPropiedades.OrderByDescending(p => p.IdPropiedad).FirstOrDefault().IdPropiedad + 1;
 
-    PropiedadDTO propiedadDTO = new PropiedadDTO()
-    {
-        IdPropiedad = propiedad.IdPropiedad,
-        Nombre = propiedad.Nombre,
-        Descripcion = propiedad.Descripcion,
-        Ubicacion = propiedad.Ubicacion,
-        Activa = propiedad.Activa
-    };
+    //PropiedadDTO propiedadDTO = new PropiedadDTO()
+    //{
+    //    IdPropiedad = propiedad.IdPropiedad,
+    //    Nombre = propiedad.Nombre,
+    //    Descripcion = propiedad.Descripcion,
+    //    Ubicacion = propiedad.Ubicacion,
+    //    Activa = propiedad.Activa
+    //};
+
+    PropiedadDTO propiedadDTO = _mapper.Map<PropiedadDTO>(propiedad);
 
     DatosPropiedad.listaPropiedades.Add(propiedad);
 
