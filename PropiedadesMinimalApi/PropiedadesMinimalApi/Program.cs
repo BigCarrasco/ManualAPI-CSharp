@@ -34,14 +34,15 @@ if (app.Environment.IsDevelopment())
 }
 
 //Obtener ALL
-app.MapGet("/api/propiedades", (ILogger<Program> logger) => 
+app.MapGet("/api/propiedades", async (ApplicationDbContext _bd, ILogger<Program> logger) => 
 {
 
     RespuestaAPI respuesta = new RespuestaAPI();
 
     logger.Log(LogLevel.Information, "Carga todas las propiedades");
 
-    respuesta.Resultado = DatosPropiedad.listaPropiedades;
+    //respuesta.Resultado = DatosPropiedad.listaPropiedades;
+    respuesta.Resultado = _bd.Propiedad;
     respuesta.Success = true;
     respuesta.codigoEstado = HttpStatusCode.OK;
     return Results.Ok(respuesta);
@@ -50,11 +51,12 @@ app.MapGet("/api/propiedades", (ILogger<Program> logger) =>
 }).WithName("ObtenerPropiedades").Produces<IEnumerable<RespuestaAPI>>(200); ;
 
 //Obtener por ID
-app.MapGet("/api/propiedades/{id:int}", (int id) =>
+app.MapGet("/api/propiedades/{id:int}", async (ApplicationDbContext _bd, int id) =>
 {
     RespuestaAPI respuesta = new RespuestaAPI();
 
-    respuesta.Resultado = DatosPropiedad.listaPropiedades.FirstOrDefault(p => p.IdPropiedad == id);
+    //respuesta.Resultado = DatosPropiedad.listaPropiedades.FirstOrDefault(p => p.IdPropiedad == id);
+    respuesta.Resultado = await _bd.Propiedad.FirstOrDefaultAsync(p => p.IdPropiedad == id);
     respuesta.Success = true;
     respuesta.codigoEstado = HttpStatusCode.OK;
     return Results.Ok(respuesta);
