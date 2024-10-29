@@ -64,7 +64,7 @@ app.MapGet("/api/propiedades/{id:int}", async (ApplicationDbContext _bd, int id)
 }).WithName("ObtenerPropiedad").Produces<RespuestaAPI>(200);
 
 // Crear propiedad
-app.MapPost("/api/propiedades", async (IMapper _mapper, 
+app.MapPost("/api/propiedades", async (ApplicationDbContext _bd, IMapper _mapper, 
     IValidator<CrearPropiedadDTO> _validacion, [FromBody] CrearPropiedadDTO crearPropiedadDTO) =>
 {
     RespuestaAPI respuesta = new RespuestaAPI() { Success = false, codigoEstado = HttpStatusCode.BadRequest};
@@ -79,7 +79,7 @@ app.MapPost("/api/propiedades", async (IMapper _mapper,
     }
 
 
-    if (DatosPropiedad.listaPropiedades.FirstOrDefault(p => p.Nombre.ToLower() == crearPropiedadDTO.Nombre.ToLower()) != null)
+    if (await _bd.Propiedad.FirstOrDefaultAsync(p => p.Nombre.ToLower() == crearPropiedadDTO.Nombre.ToLower()) != null)
     {
         respuesta.Errores.Add("Ya existe una propiedad con ese nombre");
         return Results.BadRequest(respuesta);
@@ -95,7 +95,9 @@ app.MapPost("/api/propiedades", async (IMapper _mapper,
 
     Propiedad propiedad = _mapper.Map<Propiedad>(crearPropiedadDTO);
 
-    propiedad.IdPropiedad = DatosPropiedad.listaPropiedades.OrderByDescending(p => p.IdPropiedad).FirstOrDefault().IdPropiedad + 1;
+    /*Codigo que ya genra nuestra base de datos:
+    //propiedad.IdPropiedad = DatosPropiedad.listaPropiedades.OrderByDescending(p => p.IdPropiedad).FirstOrDefault().IdPropiedad + 1;
+    */
 
     //PropiedadDTO propiedadDTO = new PropiedadDTO()
     //{
@@ -105,10 +107,11 @@ app.MapPost("/api/propiedades", async (IMapper _mapper,
     //    Ubicacion = propiedad.Ubicacion,
     //    Activa = propiedad.Activa
     //};
+    //DatosPropiedad.listaPropiedades.Add(propiedad);
+    await _bd.Propiedad.AddAsync(propiedad);
+    await _bd.SaveChangesAsync();
 
     PropiedadDTO propiedadDTO = _mapper.Map<PropiedadDTO>(propiedad);
-
-    DatosPropiedad.listaPropiedades.Add(propiedad);
 
     //return Results.CreatedAtRoute("ObtenerPropiedad", new {id = propiedad.IdPropiedad}, propiedadDTO);
 
