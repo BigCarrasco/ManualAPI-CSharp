@@ -10,9 +10,13 @@ using AutoMapper;
 using FluentValidation;
 using System.Net;
 using Microsoft.Extensions.Logging;
+using Microsoft.EntityFrameworkCore;
 
 
 var builder = WebApplication.CreateBuilder(args);
+
+//Configuracion de la base de datos
+builder.Services.AddDbContext<ApplicationDbContext>(opciones => opciones.UseSqlServer(builder.Configuration.GetConnectionString("ConexionSql")));
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
